@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bizee Operations Quiz — Knowledge Check</title>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1d4ed8; --navy:#0f1f3d; --navy-2:#16294d;
+    --green:#10b981; --green-bg:#ecfdf5; --green-bd:#6ee7b7;
+    --orange:#f59e0b; --orange-bg:#fffbeb; --orange-bd:#fcd34d;
+    --red:#ef4444; --red-bg:#fef2f2; --red-bd:#fca5a5;
+    --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --line:#e2e8f0;
+    --paper:#f6f8fc; --card:#ffffff;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --r:14px; --shadow:0 1px 2px rgba(15,31,61,.06),0 8px 24px rgba(15,31,61,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:24px 20px 80px}
+
+  /* Header */
+  header.app{
+    background:linear-gradient(135deg,var(--navy),var(--navy-2));
+    color:#fff;border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden
+  }
+  header.app::after{content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;
+    background:radial-gradient(closest-side,rgba(37,99,235,.55),transparent);border-radius:50%}
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+    color:#9db4e6;margin:0 0 6px}
+  header.app h1{margin:0;font-size:1.5rem;letter-spacing:-.01em}
+  header.app p{margin:8px 0 0;color:#c7d4ef;font-size:.92rem;max-width:60ch}
+  .meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .chip{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.18);color:#e6edfb;padding:5px 10px;border-radius:999px}
+
+  /* Progress */
+  .progress-shell{margin:20px 0 16px}
+  .progress-head{display:flex;justify-content:space-between;align-items:baseline;font-size:.82rem;color:var(--muted);margin-bottom:8px}
+  .progress-head b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .bar{height:8px;background:#e6ebf4;border-radius:999px;overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),#60a5fa);transition:width .35s ease}
+
+  /* Card */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:24px}
+  .review-banner{display:none;align-items:center;gap:10px;background:var(--orange-bg);border:1px solid var(--orange-bd);
+    color:#92580a;border-radius:10px;padding:10px 14px;font-size:.86rem;font-weight:600;margin-bottom:16px}
+  .review-banner.show{display:flex}
+  .q-eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+  .q-eyebrow .sec{color:var(--muted)}
+  .q-text{font-size:1.12rem;font-weight:600;line-height:1.5;margin:0 0 6px}
+  .q-hint{font-size:.78rem;color:var(--muted);margin:0 0 18px}
+
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;cursor:pointer;
+    border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:13px 15px;font:inherit;color:var(--ink);
+    transition:border-color .15s,background .15s,box-shadow .15s}
+  .opt:hover:not(:disabled){border-color:#bcd0f7;background:#f8faff}
+  .opt:focus-visible{outline:3px solid #bcd0f7;outline-offset:2px}
+  .opt:disabled{cursor:default}
+  .opt .key{flex:0 0 26px;height:26px;border-radius:7px;display:grid;place-items:center;font-family:var(--mono);
+    font-size:.8rem;font-weight:700;background:#eef2fb;color:var(--blue-dark)}
+  .opt .body{flex:1;font-size:.95rem;padding-top:2px}
+  .opt.correct{border-color:var(--green-bd);background:var(--green-bg)}
+  .opt.correct .key{background:var(--green);color:#fff}
+  .opt.wrong{border-color:var(--red-bd);background:var(--red-bg)}
+  .opt.wrong .key{background:var(--red);color:#fff}
+  .opt.dim{opacity:.62}
+
+  .feedback{display:none;margin-top:18px;border-radius:12px;padding:14px 16px;font-size:.9rem}
+  .feedback.show{display:block}
+  .feedback.ok{background:var(--green-bg);border:1px solid var(--green-bd)}
+  .feedback.no{background:var(--red-bg);border:1px solid var(--red-bd)}
+  .feedback .verdict{font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .feedback.ok .verdict{color:#047857}
+  .feedback.no .verdict{color:#b91c1c}
+  .feedback .why{color:var(--ink-2)}
+
+  /* Nav */
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:20px}
+  .btn{font:inherit;font-weight:600;border-radius:11px;padding:12px 20px;cursor:pointer;border:1.5px solid transparent;transition:.15s}
+  .btn:focus-visible{outline:3px solid #bcd0f7;outline-offset:2px}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.primary:hover:not(:disabled){background:var(--blue-dark)}
+  .btn.ghost{background:#fff;color:var(--ink-2);border-color:var(--line)}
+  .btn.ghost:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+
+  .dots{display:flex;flex-wrap:wrap;gap:7px;margin-top:22px;justify-content:center}
+  .dot{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--line);background:#fff;cursor:pointer;
+    font-family:var(--mono);font-size:.66rem;color:var(--muted);display:grid;place-items:center;padding:0;transition:.12s}
+  .dot:hover{border-color:#bcd0f7}
+  .dot.answered{background:#eef2fb;border-color:#cdd9f5;color:var(--blue-dark);font-weight:700}
+  .dot.current{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.18);color:var(--blue);font-weight:700}
+  .dot.answered.current{background:var(--blue);color:#fff}
+
+  /* Glossary terms */
+  .gloss{color:var(--blue-dark);border-bottom:1.5px dotted #93b4f3;cursor:help;font-weight:600}
+  #gloss-pop{position:fixed;z-index:60;max-width:300px;background:#fff;border:1px solid var(--line);
+    box-shadow:0 12px 32px rgba(15,31,61,.18);border-radius:12px;padding:13px 15px;font-size:.85rem;color:var(--ink-2);display:none}
+  #gloss-pop b{display:block;color:var(--ink);font-size:.8rem;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+
+  /* Results */
+  .results{display:none}
+  .score-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+    padding:28px;text-align:center;margin-bottom:18px}
+  .score-ring{font-size:3.2rem;font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+  .score-sub{color:var(--muted);margin-top:6px;font-size:.95rem}
+  .badge{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:9px 18px;border-radius:999px;font-weight:700;font-size:.92rem}
+  .badge.pass{background:var(--green-bg);color:#047857;border:1px solid var(--green-bd)}
+  .badge.fail{background:var(--red-bg);color:#b91c1c;border:1px solid var(--red-bd)}
+  .msg-card{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:12px;padding:18px 20px;margin-bottom:18px}
+  .msg-card h3{margin:0 0 6px;font-size:1.05rem}
+  .msg-card p{margin:0;color:var(--ink-2);font-size:.92rem}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px}
+  .panel h3{margin:0 0 14px;font-size:.95rem;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .sec-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;margin-bottom:8px;font-size:.9rem}
+  .sec-row .nm{flex:1;font-weight:600}
+  .sec-row .pct{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+  .sec-row.good{background:var(--green-bg);border:1px solid var(--green-bd)}
+  .sec-row.good .pct{color:#047857}
+  .imp{border-radius:10px;padding:13px 15px;margin-bottom:10px}
+  .imp.mid{background:var(--orange-bg);border:1px solid var(--orange-bd)}
+  .imp.low{background:var(--red-bg);border:1px solid var(--red-bd)}
+  .imp .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .imp .nm{font-weight:700;font-size:.92rem}
+  .imp .pct{font-family:var(--mono);font-weight:700}
+  .imp.mid .pct{color:#b45309}.imp.low .pct{color:#b91c1c}
+  .imp .step{font-size:.84rem;color:var(--ink-2);margin-top:6px}
+
+  .wrong-list{max-height:460px;overflow:auto;padding-right:6px}
+  .wr{border:1px solid var(--line);border-radius:12px;padding:15px 16px;margin-bottom:12px}
+  .wr .wq{font-weight:600;font-size:.92rem;margin-bottom:10px}
+  .wr .wn{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.06em}
+  .wr .ln{font-size:.86rem;margin:4px 0;padding-left:10px;border-left:3px solid var(--line)}
+  .wr .ln.you{border-color:var(--red);color:#b91c1c}
+  .wr .ln.ans{border-color:var(--green);color:#047857;font-weight:600}
+  .wr .ex{font-size:.85rem;color:var(--ink-2);margin-top:10px;background:#f8fafc;border-radius:8px;padding:10px 12px}
+  .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+  .actions .btn{flex:1;min-width:160px;text-align:center}
+
+  .note{font-size:.78rem;color:var(--muted);text-align:center;margin-top:26px;line-height:1.6}
+  @media(max-width:560px){
+    .wrap{padding:16px 12px 64px}
+    .card{padding:18px}
+    .nav{flex-direction:column-reverse}
+    .nav .btn{width:100%}
+    header.app h1{font-size:1.25rem}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <p class="eyebrow">Bizee · Customer Service Training</p>
+    <h1>Operations Knowledge Check</h1>
+    <p>45 questions across 11 operational areas. Built straight from your training material — every answer is documented. Aim for 85% to clear the check.</p>
+    <div class="meta-row">
+      <span class="chip">45 QUESTIONS</span>
+      <span class="chip">85% TO PASS</span>
+      <span class="chip">ONE AT A TIME</span>
+      <span class="chip">TAP TERMS FOR DEFINITIONS</span>
+    </div>
+  </header>
+
+  <!-- QUIZ -->
+  <div id="quiz">
+    <div class="progress-shell">
+      <div class="progress-head">
+        <span>Question <b id="qNow">1</b> of <b>45</b></span>
+        <span><b id="qAns">0</b> answered</span>
+      </div>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+
+    <div class="card">
+      <div class="review-banner" id="reviewBanner">🔒 Review mode — this question is already answered and locked.</div>
+      <div class="q-eyebrow"><span id="qSecNo"></span> · <span class="sec" id="qSec"></span></div>
+      <h2 class="q-text" id="qText"></h2>
+      <p class="q-hint">Choose the single best answer.</p>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback">
+        <div class="verdict" id="verdict"></div>
+        <div class="why" id="why"></div>
+      </div>
+      <div class="nav">
+        <button class="btn ghost" id="prevBtn">← Previous</button>
+        <button class="btn primary" id="nextBtn" disabled>Next →</button>
+      </div>
+    </div>
+
+    <div class="dots" id="dots" aria-label="Question navigation"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results"></div>
+
+  <p class="note">This is a practice knowledge check. Answers reflect the Bizee training material as written; if real-world policy differs from a question here, the live Knowledge Base and your trainer's confirmation always win.</p>
+</div>
+
+<div id="gloss-pop" role="tooltip"></div>
+
+<script>
+/* ============================================================
+   GLOSSARY
+============================================================ */
+const GLOSSARY = {
+  "LLC":"Limited Liability Company — a flexible structure whose owners (members) aren't personally responsible for business debts.",
+  "C Corporation":"A formal entity owned by shareholders through stock; it can issue multiple classes of stock and is built to raise capital.",
+  "S Corp":"A federal tax status elected with the IRS (via Form 2553), not a separate entity formed with a state.",
+  "IPO":"Initial Public Offering — when a company first sells shares of its stock to the public.",
+  "venture capital":"Investor funding for high-growth companies, usually in exchange for preferred stock.",
+  "preferred stock":"A class of stock with priority rights that venture capital investors typically require.",
+  "Registered Agent":"A person or company that receives official state and legal mail for a business at a physical in-state address.",
+  "Virtual Address":"A secure U.S. mailing address where incoming mail is scanned and uploaded to the customer's dashboard.",
+  "Form 1583":"A USPS form that gives Bizee written consent to receive and handle a customer's mail for a Virtual Address.",
+  "Colleckt":"The USPS-approved system Bizee uses to verify a customer's ID and proof of address before Form 1583 is signed.",
+  "DBA":"Doing Business As — a filing that lets a business operate under a name other than its legal name.",
+  "Assumed Business Name":"Another term for a DBA — a name a business assumes to operate under, separate from its legal name.",
+  "Trademark":"Legal protection for a brand's name, logo, or slogan, registered nationally with the USPTO.",
+  "Amendment":"A state filing that updates public-record company information, such as the name, members, or authorized shares.",
+  "EIN":"Employer Identification Number — a nine-digit IRS tax ID for a business; it isn't public information.",
+  "Form SS-4":"The IRS application form used to obtain an EIN.",
+  "Form 2553":"The IRS form a corporation or LLC files to elect S Corp tax status.",
+  "Form 1023":"The IRS application a nonprofit files for 501(c)(3) tax-exempt status. Bizee does not file it.",
+  "Form 8822-B":"The IRS form used to update business information tied to an EIN, such as the responsible party.",
+  "Foreign Qualification":"A filing that lets an existing company legally operate in a state other than where it was formed.",
+  "Certificate of Good Standing":"A state document confirming a business is active, registered, and compliant.",
+  "COGS":"Certificate of Good Standing — a state document confirming a business is active and compliant.",
+  "administratively dissolved":"When the state shuts down a business for non-compliance, such as missed filings or a lapsed agent.",
+  "voluntarily":"In dissolution, when the owners themselves formally close the business with the state.",
+  "withdrawal":"Ending a company's foreign qualification in a state. Bizee does not offer this filing.",
+  "501(c)(3)":"Federal tax-exempt status for nonprofits, applied for with the IRS using Form 1023 — Bizee doesn't file it.",
+  "Operating Agreement":"An LLC's internal rulebook covering ownership, decisions, and profit sharing among members.",
+  "Bylaws":"A corporation's internal rulebook covering officer roles, voting, and meetings.",
+  "Banking Resolution":"A document authorizing an individual to open and manage the company's bank account.",
+  "Organizer":"The person who signs and files an LLC's formation papers; their role ends once the company is formed.",
+  "Incorporator":"The corporation/nonprofit equivalent of an Organizer — signs and files the Articles, then their role ends.",
+  "franchise tax":"A recurring state tax or fee some states charge a business regardless of revenue.",
+  "Franchise Tax Report":"The name Delaware and Texas use for the recurring filing that ties to franchise tax.",
+  "disregarded entity":"A single-member LLC the IRS treats as part of its owner for tax purposes.",
+  "partnership":"A business co-owned by two or more people who share profits, management, and liability.",
+  "responsible party":"The person who ultimately owns or controls a business, named on the EIN application.",
+  "membership percentages":"How LLC ownership is measured — by percentage of the company rather than by stock shares.",
+  "ITIN":"Individual Taxpayer Identification Number — a tax ID for people who can't get an SSN.",
+  "Comptroller":"In Texas, the agency that handles franchise tax and a company's mailing address, separate from the Secretary of State.",
+  "Secretary of State":"The state office that handles business formation and public records.",
+  "PIR":"Public Information Report — the part of the Texas annual filing that updates ownership, officer, and agent details.",
+  "Service of Process":"Official delivery of legal documents, such as a lawsuit, to a business.",
+  "State Filings Bundle":"A $99/year subscription that waives Bizee's processing fee on supported state filings for a company.",
+  "authorized shares":"The maximum number of shares a corporation is allowed to issue, listed in its Articles of Incorporation."
+};
+// surface forms -> canonical glossary key, longest patterns first
+const GLOSS_PATTERNS = [
+  ["Certificate of Good Standing","Certificate of Good Standing"],
+  ["Assumed Business Name","Assumed Business Name"],
+  ["State Filings Bundle","State Filings Bundle"],
+  ["administratively dissolved","administratively dissolved"],
+  ["Administratively Dissolved","administratively dissolved"],
+  ["membership percentages","membership percentages"],
+  ["Franchise Tax Report","Franchise Tax Report"],
+  ["responsible party","responsible party"],
+  ["Responsible Party","responsible party"],
+  ["Operating Agreement","Operating Agreement"],
+  ["Foreign Qualification","Foreign Qualification"],
+  ["foreign[- ]qualif\\w+","Foreign Qualification"],
+  ["disregarded entity","disregarded entity"],
+  ["Banking Resolution","Banking Resolution"],
+  ["preferred stock","preferred stock"],
+  ["venture capital","venture capital"],
+  ["authorized shares","authorized shares"],
+  ["Secretary of State","Secretary of State"],
+  ["Service of Process","Service of Process"],
+  ["C Corporation","C Corporation"],
+  ["C[- ]Corp\\b","C Corporation"],
+  ["S Corporation","S Corp"],
+  ["S[- ]Corp\\b","S Corp"],
+  ["Registered Agent","Registered Agent"],
+  ["Virtual Address","Virtual Address"],
+  ["franchise tax","franchise tax"],
+  ["Franchise Tax","franchise tax"],
+  ["Incorporator","Incorporator"],
+  ["Organizer","Organizer"],
+  ["Form 1583","Form 1583"],
+  ["Form SS-4","Form SS-4"],
+  ["Form 2553","Form 2553"],
+  ["Form 1023","Form 1023"],
+  ["Form 8822-B","Form 8822-B"],
+  ["501\\(c\\)\\(3\\)","501(c)(3)"],
+  ["Operating","Operating Agreement"],
+  ["Trademark","Trademark"],
+  ["trademark","Trademark"],
+  ["Amendment","Amendment"],
+  ["Colleckt","Colleckt"],
+  ["Comptroller","Comptroller"],
+  ["voluntarily","voluntarily"],
+  ["withdraw","withdrawal"],
+  ["Withdraw","withdrawal"],
+  ["Bylaws","Bylaws"],
+  ["COGS","COGS"],
+  ["ITIN","ITIN"],
+  ["IPO","IPO"],
+  ["PIR","PIR"],
+  ["DBA","DBA"],
+  ["EIN","EIN"],
+  ["LLC","LLC"]
+];
+
+function escHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function addGlossaryLinks(raw){
+  // Work on escaped text; wrap first occurrence of each canonical key only once.
+  let text = escHtml(raw);
+  const used = new Set();
+  // protect already-wrapped spans by tokenizing
+  for(const [pat, key] of GLOSS_PATTERNS){
+    if(used.has(key)) continue;
+    if(!GLOSSARY[key]) continue;
+    const re = new RegExp("(?<![\\w-])("+pat+")(?![\\w-])");
+    const m = text.match(re);
+    if(m){
+      const start = m.index, end = start + m[0].length;
+      // skip if inside an existing span tag region (rough check)
+      const before = text.slice(0,start);
+      const openTags = (before.match(/<span/g)||[]).length;
+      const closeTags = (before.match(/<\/span/g)||[]).length;
+      if(openTags>closeTags) continue;
+      const word = m[1];
+      text = before + '<span class="gloss" data-term="'+key+'">'+word+'</span>' + text.slice(end);
+      used.add(key);
+    }
+  }
+  return text;
+}
+
+/* glossary popup behavior */
+const pop = document.getElementById('gloss-pop');
+function showGlossary(term, x, y){
+  if(!GLOSSARY[term]) return;
+  pop.innerHTML = '<b>'+escHtml(term)+'</b>'+escHtml(GLOSSARY[term]);
+  pop.style.display='block';
+  const w = pop.offsetWidth, h = pop.offsetHeight;
+  let px = Math.min(x, window.innerWidth - w - 12);
+  let py = y + 14;
+  if(py + h > window.innerHeight - 8) py = y - h - 14;
+  pop.style.left = Math.max(8,px)+'px';
+  pop.style.top = Math.max(8,py)+'px';
+}
+function hideGlossary(){ pop.style.display='none'; }
+document.addEventListener('click',e=>{
+  const t = e.target.closest('.gloss');
+  if(t){ e.stopPropagation(); showGlossary(t.dataset.term, e.clientX, e.clientY); }
+  else if(!e.target.closest('#gloss-pop')) hideGlossary();
+});
+window.addEventListener('scroll',hideGlossary,true);
+window.addEventListener('resize',hideGlossary);
+
+/* ============================================================
+   QUESTION BANK — every correct answer is stated in the
+   Bizee training files. Stored by VALUE so shuffling is safe.
+============================================================ */
+const SECTIONS = [
+  "Entity Types & Tax Classifications",
+  "Registered Agent",
+  "Virtual Address",
+  "Amendment, Organizer & Internal Docs",
+  "EIN",
+  "DBA & Trademark",
+  "Annual Report & Compliance",
+  "Dissolution, Reinstatement & Good Standing",
+  "Foreign Qualification",
+  "Pricing & Packages",
+  "Policies, Refunds & Order Lifecycle"
+];
+
+const NEXT_STEPS = {
+  "Entity Types & Tax Classifications":"Re-read the LLC, C Corp, Nonprofit and S Corp pages — focus on members vs shareholders, why a C Corp fits VC/IPO, that an S Corp is an IRS status, and the S Corp eligibility limits.",
+  "Registered Agent":"Review the Registered Agent page and its cancellation policy — RA requirements, the $149 auto-renewal, that switching agents doesn't auto-cancel, and the staged-resignation/Change-of-Agent warning.",
+  "Virtual Address":"Go back over the Virtual Address page — the $29/month price, the OR/IL/AR and no-package limits, the Colleckt/Form 1583 order, and the 5-business-day forwarding window.",
+  "Amendment, Organizer & Internal Docs":"Review Articles of Formation, Internal Governance, and the Amendment page — Operating Agreement vs Bylaws, the Organizer's role ending at formation, and that an Amendment never updates the IRS.",
+  "EIN":"Re-read the EIN page — it's a private nine-digit IRS ID, obtained after formation via Form SS-4, who the responsible party is, and exactly when a new EIN is required.",
+  "DBA & Trademark":"Review the DBA and Trademark pages — DBA filing levels (state vs county), name/logo/slogan as separate trademarks, and that a trademark doesn't authorize local operation.",
+  "Annual Report & Compliance":"Go back over the Annual Report pages by state — it's compliance not tax, the Texas two-filing rule and $2.47M block, the Delaware share-tax schedule, and Florida's late-fee rules.",
+  "Dissolution, Reinstatement & Good Standing":"Review Dissolution, Reinstatement and COGS — voluntary vs administrative status, the 12 reinstatement states, COGS requirements, and reinstate-before-dissolve.",
+  "Foreign Qualification":"Re-read the Foreign Qualification page — the COGS-then-file order, the DBA fix when a name is taken, and that withdrawal and domestication aren't offered by Bizee.",
+  "Pricing & Packages":"Review the product pricing tables — Annual Report $129/$99, the $199 vs $99 filing fees, Business Contract Templates $150 / included with Premium, and the Formation Kit add-on rules.",
+  "Policies, Refunds & Order Lifecycle":"Re-read the Main Order Lifecycle and the cancellation pages — Review-stage edits, the hold table (only billing holds refund), and that misc orders in Processing can't be canceled."
+};
+
+// q: stem, options: 4 strings, answer: exact correct string, explanation
+const QUESTIONS = [
+/* ---------- SECTION 1: Entity Types & Tax Classifications (5) ---------- */
+{s:0,q:`On an LLC's internal documents, what are the people who own the company formally called, and how is that ownership measured?`,
+ options:[
+  `Shareholders, since ownership is represented by issued shares of stock`,
+  `Members, since ownership is based on defined membership percentages`,
+  `Organizers, since they sign and submit the formation paperwork filed`,
+  `Partners, since they jointly manage and share full personal liability`],
+ answer:`Members, since ownership is based on defined membership percentages`,
+ ex:`LLC owners are members, and ownership runs on membership percentages. "Shareholders/stock" is true — but for corporations, not LLCs. The Organizer does sign and file the Articles, yet their role ends at formation and they aren't owners. "Partners" describes a general partnership, which carries personal liability and which Bizee doesn't form.`},
+
+{s:0,q:`A caller says they want to "form an S Corp." Which description of what an S Corp actually is, is MOST accurate?`,
+ options:[
+  `A state-registered entity type that gives its owners pass-through taxation`,
+  `A federal tax status elected with the IRS, not a separate entity`,
+  `A corporation that has chosen to issue more than one class of stock`,
+  `An LLC that receives pass-through tax treatment automatically upon formation`],
+ answer:`A federal tax status elected with the IRS, not a separate entity`,
+ ex:`An S Corp isn't formed with a state — it's an IRS tax status elected via Form 2553. Pass-through taxation is real, but it's a tax status, not a state entity (flaw in the first option). S Corps may have only one class of stock, so "more than one class" is wrong. An LLC does get pass-through by default, but that default isn't an S Corp election.`},
+
+{s:0,q:`A founder is raising a priced round where a VC fund will take preferred stock. She wants to keep the door open to an IPO and plans to reinvest profits. Which entity BEST aligns with all of these goals?`,
+ options:[
+  `LLC taxed as a partnership, giving flexible, pass-through tax treatment`,
+  `S Corporation, passing profits through and reducing self-employment taxes`,
+  `C Corporation, able to issue multiple stock classes and go public`,
+  `Nonprofit corporation, reinvesting all of its income toward a mission`],
+ answer:`C Corporation, able to issue multiple stock classes and go public`,
+ ex:`A C Corp can issue multiple classes of stock (what VCs expect) and is built to scale and go public. The LLC is flexible — but issues membership interests, not the stock classes investors want. The S Corp's tax angle is real, yet it allows only one class of stock and caps shareholders at 100, blocking VC funding. A nonprofit isn't owned and can't distribute to investors.`},
+
+{s:0,q:`A nonprofit client wants 501(c)(3) tax-exempt status. Which statement BEST describes Bizee's role?`,
+ options:[
+  `Bizee files Form 1023 with the IRS once the state nonprofit is formed`,
+  `Bizee forms the state nonprofit; the client files Form 1023 with the IRS`,
+  `Bizee files the 501(c)(3) only for nonprofits formed in certain states`,
+  `Bizee forms the nonprofit and submits the 1023-EZ on the client's behalf`],
+ answer:`Bizee forms the state nonprofit; the client files Form 1023 with the IRS`,
+ ex:`Bizee forms the state-level nonprofit corporation but does not assist with Form 1023 or 1023-EZ — the responsible parties file with the IRS. The first and last options claim Bizee files the IRS form (it doesn't). The "certain states" option is wrong because 501(c)(3) is a federal IRS status, not a state-by-state filing.`},
+
+{s:0,q:`A business plans to elect S Corp status. Under the IRS rules in the training, which single feature is still PERMISSIBLE?`,
+ options:[
+  `One stock class with shares carrying different voting rights`,
+  `A total of one hundred and five individual U.S.-resident shareholders`,
+  `One shareholder that is another LLC rather than an individual person`,
+  `A non-resident foreign individual listed among the company's shareholders`],
+ answer:`One stock class with shares carrying different voting rights`,
+ ex:`Only one class of stock is allowed, but voting rights within that class may still differ — so that feature is fine. The 100-shareholder cap means 105 is over the limit. Other entities like LLCs can't be S Corp shareholders. And foreigners can't apply, so a non-resident foreign shareholder is disqualifying.`},
+
+/* ---------- SECTION 2: Registered Agent (4) ---------- */
+{s:1,q:`Which set of conditions BEST describes what a valid Registered Agent must meet?`,
+ options:[
+  `A physical in-state address staffed weekdays, with no P.O. boxes allowed`,
+  `Any in-state mailing address, including a P.O. box, monitored on weekdays`,
+  `A physical address in any state, available during standard weekday hours`,
+  `An in-state address staffed seven days a week, excluding mail-center boxes`],
+ answer:`A physical in-state address staffed weekdays, with no P.O. boxes allowed`,
+ ex:`An RA needs a physical in-state address, someone available Monday–Friday, and no P.O. boxes or mail centers. The P.O.-box option is out because boxes aren't allowed. "Any state" is wrong — it must be the formation state. "Seven days a week" is wrong; it's weekdays only.`},
+
+{s:1,q:`How is the Registered Agent service priced when a customer forms their business through Bizee?`,
+ options:[
+  `Free the first year with formation, then $149 each year automatically`,
+  `Free the first year with formation, then $119 each year automatically`,
+  `Free the first two years with formation, then $149 each year afterward`,
+  `Always $149 at checkout, even when forming the business through Bizee`],
+ answer:`Free the first year with formation, then $149 each year automatically`,
+ ex:`It's included free the first year when forming with Bizee, then renews automatically at $149/year. The $119 figure is incorrect per the documentation. There's no two-year free period. And the last option ignores the free first year that comes with formation.`},
+
+{s:1,q:`A customer files a Change of Agent to move away from Bizee. What happens to Bizee's Registered Agent subscription?`,
+ options:[
+  `It cancels automatically once the new agent is recorded with the state`,
+  `It continues until the customer explicitly asks Bizee to stop the service`,
+  `It cancels automatically, but only after the current billing period closes`,
+  `It can be ended through the next Annual Report or through an Amendment filing`],
+ answer:`It continues until the customer explicitly asks Bizee to stop the service`,
+ ex:`Switching agents does not auto-cancel Bizee's RA service — the customer must explicitly request cancellation. The two "cancels automatically" options are false. The last option is wrong twice over: RA changes can't be done via an Annual Report or Amendment, and that wouldn't stop the subscription anyway.`},
+
+{s:1,q:`A customer cancels Bizee's Registered Agent service mid-term, and Bizee is currently listed as their agent with the state. Which handling is BEST?`,
+ options:[
+  `Resign with the state immediately, then have them appoint a new agent`,
+  `Stage the resignation for term-end and warn them to file a Change of Agent`,
+  `Keep the service active to expiration; no Change of Agent filing is needed`,
+  `Resign immediately and refund any year requested within six months of renewal`],
+ answer:`Stage the resignation for term-end and warn them to file a Change of Agent`,
+ ex:`RA resignation is staged and triggers only after the active term ends (unlike domains or VA, which cancel immediately). Because Bizee is listed with the state, you must warn the customer to file a Change of Agent or risk losing good standing. The two "resign immediately" options are wrong for RA, and one also misstates the refund window — it's one year, requested within three months, not six.`},
+
+/* ---------- SECTION 3: Virtual Address (4) ---------- */
+{s:2,q:`What is the price of the Virtual Address service?`,
+ options:[
+  `$29 per month, billed as a recurring subscription`,
+  `$29 per year, billed as a recurring annual subscription`,
+  `$149 per year, matching the Registered Agent renewal fee`,
+  `$99 one time, then unlimited mail handling at no charge`],
+ answer:`$29 per month, billed as a recurring subscription`,
+ ex:`The Virtual Address is a $29/month subscription. The "$29 per year" option changes the billing cadence. "$149/year" borrows the RA renewal price. And there's no one-time $99 model for the VA.`},
+
+{s:2,q:`Which statement about Virtual Address limitations is MOST accurate?`,
+ options:[
+  `Packages are accepted, but it can't serve as a Registered Agent address`,
+  `It can't be a Registered Agent address and is unavailable in OR, IL, AR`,
+  `It works as a Registered Agent address everywhere except OR, IL, and AR`,
+  `It's available in every state but never accepts checks or debit cards`],
+ answer:`It can't be a Registered Agent address and is unavailable in OR, IL, AR`,
+ ex:`The VA can't be used as a Registered Agent address and is unavailable in Oregon, Illinois, and Arkansas. Packages are not accepted, so the first option fails. The third wrongly allows it as an RA address. The last is wrong on two counts — it isn't available in all states, and checks and cards are actually forwarded.`},
+
+{s:2,q:`In the Virtual Address sign-up, how does Form 1583 verification work?`,
+ options:[
+  `The customer signs Form 1583 first, then verifies ID through Colleckt later`,
+  `ID and proof of address are verified via Colleckt before Form 1583 is signed`,
+  `Bizee verifies the ID internally, so no Form 1583 signature is required`,
+  `Form 1583 is optional unless the customer also forwards their mail abroad`],
+ answer:`ID and proof of address are verified via Colleckt before Form 1583 is signed`,
+ ex:`USPS requires Photo ID and proof-of-address verification, done through the USPS-approved Colleckt, before Form 1583 can be signed. The first option reverses that order. The third removes the 1583 requirement, and the last makes it optional — but it's required for any VA use.`},
+
+{s:2,q:`Mail was scanned and uploaded to a Virtual Address customer's dashboard. How long do they have to request forwarding, and what should you tell them?`,
+ options:[
+  `Five business days to request forwarding; after that the mail is discarded`,
+  `Thirty days to request forwarding, and you should state this window upfront`,
+  `Five business days, and you should proactively mention the 30-day destruction`,
+  `No deadline applies, since uploaded mail is retained for the account's lifetime`],
+ answer:`Five business days to request forwarding; after that the mail is discarded`,
+ ex:`Customers have five business days to request forwarding before the mail is destroyed — that's the figure to work from. The 30-day window is wrong. The 30-day letter-destruction rule is internal and must not be shared proactively, so volunteering it is wrong. And uploaded mail isn't retained indefinitely.`},
+
+/* ---------- SECTION 4: Amendment, Organizer & Internal Docs (4) ---------- */
+{s:3,q:`Which internal document is the LLC's rulebook, as opposed to a corporation's?`,
+ options:[
+  `Corporate Bylaws, which set voting procedures and officer roles for members`,
+  `The Operating Agreement, a private contract among the LLC's members`,
+  `Articles of Organization, the state filing that legally creates the company`,
+  `The Banking Resolution, which names who may open the company's accounts`],
+ answer:`The Operating Agreement, a private contract among the LLC's members`,
+ ex:`The Operating Agreement is the LLC's internal rulebook among members. Bylaws are the corporation's internal rulebook, so that's the wrong entity. The Articles of Organization create the LLC with the state but aren't the internal governing contract. The Banking Resolution only authorizes an account signer — a much narrower job.`},
+
+{s:3,q:`What happens to the Organizer's role after an LLC is formed?`,
+ options:[
+  `The Organizer becomes a managing member once the LLC is formally created`,
+  `The Organizer signs and files the Articles, then their role ends at formation`,
+  `The Organizer is the first director until shareholders elect a full board`,
+  `The Organizer stays the company's authorized signer for ongoing state filings`],
+ answer:`The Organizer signs and files the Articles, then their role ends at formation`,
+ ex:`The Organizer (or Incorporator for corporations) only prepares and files the Articles; their role ends at formation, and they aren't owners or ongoing decision-makers. The other three options each give the Organizer a continuing role — member, director, or signer — that the training explicitly rules out.`},
+
+{s:3,q:`Which change requires a state Amendment, rather than just an internal update?`,
+ options:[
+  `Updating the company's mailing address that's kept only in internal records`,
+  `Changing the names of the members, directors, or officers on record`,
+  `Revising each member's ownership percentage within the Operating Agreement`,
+  `Correcting shareholder details that the state never records in public files`],
+ answer:`Changing the names of the members, directors, or officers on record`,
+ ex:`An Amendment is required for state public-record information such as the names of members, directors, or officers. A mailing address is updated internally, not via Amendment. Ownership percentages are an internal Operating Agreement matter. And shareholder details are never recorded by the state, so they don't need an Amendment.`},
+
+{s:3,q:`A customer assumes filing an Amendment will update their business name with the IRS. What's the BEST response?`,
+ options:[
+  `It will; once the state Amendment posts, the IRS record updates automatically`,
+  `It won't; they contact the IRS directly, since Bizee can't via an Amendment`,
+  `It will, but only if they also add Form 8822-B to that same Amendment order`,
+  `It won't, so they should file a brand-new EIN application to refresh the name`],
+ answer:`It won't; they contact the IRS directly, since Bizee can't via an Amendment`,
+ ex:`An Amendment updates state records only; it doesn't change IRS/EIN information, and Bizee can't update EIN records through an Amendment. The customer contacts the IRS directly (a signed letter or the CP575 slip, possibly Form 8822-B). "Automatic IRS update" is false, you can't bundle 8822-B into the Amendment, and a simple name change doesn't require a new EIN.`},
+
+/* ---------- SECTION 5: EIN (4) ---------- */
+{s:4,q:`Which description of an EIN is MOST accurate, including how Bizee prices it?`,
+ options:[
+  `A nine-digit IRS tax ID that is published in public business databases`,
+  `A nine-digit IRS tax ID that isn't public; $70, included in Standard/Premium`,
+  `A state-issued tax ID required only for corporations and partnerships filing`,
+  `A nine-digit number issued by the state where the business was first formed`],
+ answer:`A nine-digit IRS tax ID that isn't public; $70, included in Standard/Premium`,
+ ex:`The EIN is a nine-digit IRS-issued tax ID, not public information, priced at $70 and included in the Standard and Premium packages. The first option wrongly calls it public. The other two attribute it to the state — but it's issued by the IRS.`},
+
+{s:4,q:`When and how should an EIN be obtained, per the training?`,
+ options:[
+  `Before forming the entity, so the EIN is ready the moment the company exists`,
+  `After the entity is formed, via Form SS-4, with no IRS fee to apply`,
+  `After formation, using Form 2553 submitted online or by fax to the IRS`,
+  `At any time, but only by paying the IRS a standard application filing fee`],
+ answer:`After the entity is formed, via Form SS-4, with no IRS fee to apply`,
+ ex:`Per IRS guidance, the EIN is obtained after formation (to avoid name mismatches), via Form SS-4 online or by fax, with no IRS fee. The first option reverses the timing. The third names the wrong form — 2553 is the S Corp election, not the EIN application. And the IRS doesn't charge an application fee.`},
+
+{s:4,q:`Who should normally be named as the responsible party on an EIN application?`,
+ options:[
+  `Any unaffiliated third party Bizee assigns to streamline the IRS application`,
+  `The owner, majority shareholder, or managing member who controls the business`,
+  `The Registered Agent, since they already receive the company's official mail`,
+  `The Organizer who signed the Articles and submitted them to the state office`],
+ answer:`The owner, majority shareholder, or managing member who controls the business`,
+ ex:`The responsible party is the individual who ultimately owns or controls the business — owner, majority shareholder, or managing member. The IRS technically allows any individual, but assigning someone without authority is uncommon and not recommended. The RA and the Organizer are roles whose functions don't match the responsible-party definition.`},
+
+{s:4,q:`Which situation BEST requires obtaining a brand-new EIN?`,
+ options:[
+  `A corporation is acquired by another company and absorbed into it`,
+  `An LLC changes its business name while keeping the same entity structure`,
+  `A corporation updates the mailing address it has on file with the IRS`,
+  `An LLC moves its principal office to a new suite within the same building`],
+ answer:`A corporation is acquired by another company and absorbed into it`,
+ ex:`A new EIN is required for a new entity, a merger, or being acquired — an acquisition qualifies. A simple name change with the same structure does not require a new EIN. And address updates are record changes, not new-EIN triggers.`},
+
+/* ---------- SECTION 6: DBA & Trademark (4) ---------- */
+{s:5,q:`Which statement BEST describes what a DBA is?`,
+ options:[
+  `A federal registration that protects the brand name across the entire country`,
+  `A filing that lets a business operate under a name other than its legal name`,
+  `A conversion that turns a sole proprietorship into a formal LLC entity`,
+  `A state tax election that lets a business use a simplified reporting name`],
+ answer:`A filing that lets a business operate under a name other than its legal name`,
+ ex:`A DBA lets a business operate under a name different from its legal name ($99 plus a local fee, and not offered in every state). The first option describes a trademark. The conversion option describes something Bizee doesn't do. And there's no DBA "tax election."`},
+
+{s:5,q:`How does the filing level of a DBA affect where it's valid?`,
+ options:[
+  `Filed at the state level, a DBA is valid only in the county where it's filed`,
+  `Filed at the county level, a DBA is valid only within that single county`,
+  `Filed at either level, a DBA is automatically valid across the whole country`,
+  `Filed in Texas or California, a DBA is processed and recognized statewide`],
+ answer:`Filed at the county level, a DBA is valid only within that single county`,
+ ex:`A county-level DBA is valid only in that county, so multiple counties need separate filings; a state-level DBA is valid statewide. The first option inverts the rule. Nationwide validity is wrong. And Texas and California both file at the county level — it's Oregon that files at the state level.`},
+
+{s:5,q:`A customer wants to protect their brand name, logo, and slogan with trademarks. Which statement is MOST accurate?`,
+ options:[
+  `One application covers the name, logo, and slogan; Bizee handles all renewals`,
+  `Name, logo, and slogan are separate trademarks, each needing its own application`,
+  `A single trademark protects all three elements and never needs to be renewed`,
+  `The name and logo file together, but Bizee manages the maintenance filings`],
+ answer:`Name, logo, and slogan are separate trademarks, each needing its own application`,
+ ex:`The name, logo, and slogan are three separate trademarks, each requiring its own application; registration lasts 10 years with maintenance filings the owner must handle — Bizee does not manage renewals. The other options wrongly bundle elements, put renewals on Bizee, or claim no renewal is ever needed.`},
+
+{s:5,q:`A client believes their federal trademark lets them legally operate under that name in their state. Which clarification is MOST accurate?`,
+ options:[
+  `A trademark gives nationwide brand protection but doesn't authorize local operation`,
+  `A trademark replaces the DBA, since federal rights cover local operating needs too`,
+  `A DBA gives brand protection nationwide, so the trademark is largely redundant here`,
+  `A trademark and a DBA both grant exclusive nationwide rights to use the name freely`],
+ answer:`A trademark gives nationwide brand protection but doesn't authorize local operation`,
+ ex:`A federal trademark provides nationwide brand protection but does not authorize operating under the name in a specific state — that local authorization is what a DBA provides (and the DBA gives no brand protection). The trademark doesn't replace the DBA, the DBA doesn't give nationwide protection, and the two aren't equivalent nationwide grants.`},
+
+/* ---------- SECTION 7: Annual Report & Compliance (4) ---------- */
+{s:6,q:`Which description of an Annual Report is MOST accurate?`,
+ options:[
+  `A yearly income filing that reports business revenue to the state tax agency`,
+  `A compliance filing that keeps a business in good standing, not a tax return`,
+  `A filing used to change the company name, address, or members with the state`,
+  `An IRS submission that confirms the business met its federal tax obligations`],
+ answer:`A compliance filing that keeps a business in good standing, not a tax return`,
+ ex:`An Annual Report is a compliance filing that keeps a business in good standing; it is not a tax return, and at Bizee it can't be used to change company info — that's an Amendment. The "income filing" and "IRS submission" options wrongly cast it as a tax filing, and the "change info" option is what an Amendment does.`},
+
+{s:6,q:`A Texas customer orders their Annual Report. Which description is MOST accurate?`,
+ options:[
+  `A single Franchise Tax Report filed with the Secretary of State by May 1`,
+  `Two filings — the Franchise Tax Report and the PIR — due to the Comptroller May 15`,
+  `One Public Information Report due May 15, filed only when tax is actually owed`,
+  `Two filings due May 15, which Bizee processes for any revenue level reported`],
+ answer:`Two filings — the Franchise Tax Report and the PIR — due to the Comptroller May 15`,
+ ex:`The Texas Annual Report is two filings — the Franchise Tax Report and the Public Information Report — both due May 15 to the Comptroller, even if no tax is owed. It's not a single SOS filing by May 1, it isn't conditioned on tax owed, and Bizee blocks orders at or above $2.47M revenue, so "any revenue level" is wrong.`},
+
+{s:6,q:`A Delaware corporation has 10,005 authorized shares. Using the franchise-tax schedule, what is the tax, and when is the report due?`,
+ options:[
+  `$335, due March 1, since corporations and nonprofits share that deadline`,
+  `$335, due June 1, the same deadline Delaware sets for its LLC filings`,
+  `$250, due March 1, because the count stays within the 10,000-share bracket`,
+  `$425, due March 1, adding two $85 increments above the base minimum tax`],
+ answer:`$335, due March 1, since corporations and nonprofits share that deadline`,
+ ex:`Corporations and nonprofits file the Franchise Tax Report by March 1. For 10,005 shares: $250 (for 5,001–10,000) plus one $85 increment for crossing into the next 10,000 = $335. June 1 is the LLC date. $250 ignores the 5 shares that cross the bracket. And $425 over-counts the increments.`},
+
+{s:6,q:`A Florida LLC missed the Annual Report deadline. Which statement about fees and refunds is MOST accurate?`,
+ options:[
+  `A $400 late fee applies after May 1, and it can be removed right at checkout`,
+  `A $400 late fee applies after May 1; refunds need a Filing Dept DB authorization`,
+  `A $200 late fee applies, with administrative dissolution risk after October 1`,
+  `A $400 late fee applies, fully refundable on request without any internal note`],
+ answer:`A $400 late fee applies after May 1; refunds need a Filing Dept DB authorization`,
+ ex:`Filing after May 1 adds a $400 late fee that can't be removed at checkout, but it can be refunded only if the Filing Department posted a DB Comment authorizing the amount. It isn't removable at checkout, $200 is the extra dissolution fine (with the deadline being the third Friday in September), and it isn't refundable with no authorization.`},
+
+/* ---------- SECTION 8: Dissolution, Reinstatement & Good Standing (4) ---------- */
+{s:7,q:`A company shows on the SOS site as "Administratively Dissolved." How should its status be recorded internally?`,
+ options:[
+  `As "Dissolved," since any dissolved company is treated the same internally`,
+  `As "Delinquent/Revoked," reserving "Dissolved" for voluntary terminations`,
+  `As "Dissolved," then file a withdrawal because Bizee handles that termination`,
+  `As "Delinquent/Revoked," which also lets Bizee reinstate it in every state`],
+ answer:`As "Delinquent/Revoked," reserving "Dissolved" for voluntary terminations`,
+ ex:`Administratively dissolved, revoked, or delinquent companies are marked "Delinquent/Revoked"; "Dissolved" is reserved only for voluntary terminations. The two "Dissolved" options misuse that label for an administrative case (and one adds a withdrawal Bizee doesn't offer). The last option uses the right status but wrongly claims reinstatement is available everywhere.`},
+
+{s:7,q:`In how many states can Bizee reinstate a company that was voluntarily dissolved?`,
+ options:[
+  `Bizee reinstates voluntarily-dissolved companies in all fifty states for $199`,
+  `Bizee reinstates voluntarily-dissolved companies in a limited set of states`,
+  `Bizee reinstates any administratively-dissolved foreign qualification on request`,
+  `Bizee reinstates voluntarily-dissolved companies only in California and Texas`],
+ answer:`Bizee reinstates voluntarily-dissolved companies in a limited set of states`,
+ ex:`Voluntarily-dissolved reinstatement is offered only in a limited list of states (12 in the training), so "all fifty" is wrong. Bizee doesn't handle reinstatement for foreign qualifications at all. And the list is more than just California and Texas.`},
+
+{s:7,q:`A customer needs a Certificate of Good Standing. Which condition is MOST essential for the state to issue it?`,
+ options:[
+  `The company filed its very first Annual Report at least once previously`,
+  `The company is active, has no overdue fees, and has a valid agent on file`,
+  `The company purchased the Premium package when it first formed with Bizee`,
+  `The company holds a current IRS tax clearance confirming federal compliance`],
+ answer:`The company is active, has no overdue fees, and has a valid agent on file`,
+ ex:`To issue a COGS, the business must be active and in good standing, with no overdue reports or fees and a valid Registered Agent on file. A prior first Annual Report isn't the stated requirement, the package purchased is irrelevant, and a COGS is not a tax document, so an IRS tax clearance isn't what's needed.`},
+
+{s:7,q:`A company was administratively dissolved by the state and now wants to formally (voluntarily) dissolve. What's the correct path?`,
+ options:[
+  `File Articles of Dissolution right away, since the entity is already inactive`,
+  `Reinstate it to good standing first, then file the Articles of Dissolution`,
+  `Skip dissolution entirely, because the state already ended the entity for them`,
+  `File a withdrawal with Bizee, which handles this for administratively-closed firms`],
+ answer:`Reinstate it to good standing first, then file the Articles of Dissolution`,
+ ex:`A company the state already dissolved must first be reinstated — current on overdue payments and back in good standing — before it can file Articles of Dissolution. Filing dissolution right away skips that step, treating administrative dissolution as a clean close is wrong, and a withdrawal is for foreign qualifications and isn't offered by Bizee.`},
+
+/* ---------- SECTION 9: Foreign Qualification (4) ---------- */
+{s:8,q:`Which statement BEST describes a Foreign Qualification?`,
+ options:[
+  `A new formation that creates a separate company in the second state entirely`,
+  `A filing letting an existing company operate in a state beyond its home state`,
+  `A domestication that moves the company's registration from one state to another`,
+  `A withdrawal that ends the company's authority to operate outside its home state`],
+ answer:`A filing letting an existing company operate in a state beyond its home state`,
+ ex:`A Foreign Qualification lets an existing company operate in a state other than where it formed ($199 plus a state fee), with obligations in both states. A new formation creates a separate company. Domestication moves a registration (and Bizee doesn't handle it). A withdrawal ends a foreign qualification (also not offered).`},
+
+{s:8,q:`A Wyoming LLC wants to operate in California. What's the correct sequence for Foreign Qualification?`,
+ options:[
+  `File the California Foreign Qualification, then request Wyoming's good-standing certificate`,
+  `Get Wyoming's Certificate of Good Standing first, then file the California qualification`,
+  `Apply for California franchise tax first, then obtain the Wyoming good-standing certificate`,
+  `File a California domestication first, then request Wyoming's certificate of good standing`],
+ answer:`Get Wyoming's Certificate of Good Standing first, then file the California qualification`,
+ ex:`The process is: first obtain the Certificate of Good Standing from the home state, then file the Foreign Qualification in the target state. The first option reverses the order, the third starts with franchise tax (not the documented first step), and the last swaps in domestication, which Bizee doesn't handle.`},
+
+{s:8,q:`A company's exact name is already taken in the state it's foreign-qualifying into. What's the BEST solution?`,
+ options:[
+  `File a DBA, or Assumed Business Name, in that specific state`,
+  `File a domestication so the company keeps its original legal name there`,
+  `Withdraw the qualification and form a new company under a different name`,
+  `Request a home-state name reservation to override the new state's records`],
+ answer:`File a DBA, or Assumed Business Name, in that specific state`,
+ ex:`When the name isn't available in the foreign state, the company files a DBA / Assumed Business Name to operate under there while keeping its original name elsewhere. Domestication isn't handled by Bizee, abandoning the qualification is unnecessary, and a home-state reservation can't override another state's records.`},
+
+{s:8,q:`A customer asks Bizee to withdraw (dissolve) their foreign qualification in another state. What's the BEST handling?`,
+ options:[
+  `Process the withdrawal as a standard dissolution order through the dashboard`,
+  `Explain Bizee doesn't offer this, and direct them to contact the state directly`,
+  `File a domestication instead, since it accomplishes the same withdrawal outcome`,
+  `Reinstate the foreign qualification first, then process the withdrawal filing`],
+ answer:`Explain Bizee doesn't offer this, and direct them to contact the state directly`,
+ ex:`Bizee does not provide dissolution or reinstatement (withdrawal) for foreign qualifications, so the customer is directed to contact the state directly. It isn't a normal dissolution order, domestication is also not handled by Bizee, and there's no reinstatement step Bizee performs for foreign qualifications.`},
+
+/* ---------- SECTION 10: Pricing & Packages (4) ---------- */
+{s:9,q:`How is an Annual Report priced through Bizee?`,
+ options:[
+  `$129 standalone, or $99 with the State Filings Bundle, plus the state fee`,
+  `$99 standalone, or $129 with the State Filings Bundle, plus the state fee`,
+  `$129 standalone, with the State Filings Bundle waiving the state fee too`,
+  `$99 flat, with no separate state fee owed once the order is submitted`],
+ answer:`$129 standalone, or $99 with the State Filings Bundle, plus the state fee`,
+ ex:`The Annual Report is $129 standalone or $99 with the State Filings Bundle, plus the state fee either way. The second option swaps the two prices. The Bundle waives Bizee's processing fee, not the state fee. And the state fee is always owed.`},
+
+{s:9,q:`Which Bizee processing fee is paired correctly with its product?`,
+ options:[
+  `Dissolution at $99, with the state fee added separately at checkout`,
+  `Foreign Qualification at $199, with the state fee added on top`,
+  `Certificate of Good Standing at $199, plus the applicable state fee`,
+  `Change of Agent at $149, plus whatever the state charges to file`],
+ answer:`Foreign Qualification at $199, with the state fee added on top`,
+ ex:`Foreign Qualification's Bizee fee is $199 plus the state fee. Dissolution is actually $199, not $99. A Certificate of Good Standing is $99, not $199. And Change of Agent is $99 — the $149 figure belongs to the Registered Agent service.`},
+
+{s:9,q:`A Standard-package customer (no Premium) wants the Business Contract Templates added. What applies?`,
+ options:[
+  `They're free, since the Standard package already bundles the full template library`,
+  `A $150 one-time fee applies; the library is included only with Premium`,
+  `A $99 add-on applies, matching the Business Formation Kit's pricing exactly`,
+  `They're unavailable as an add-on and require upgrading the entire package`],
+ answer:`A $150 one-time fee applies; the library is included only with Premium`,
+ ex:`The Business Contract Templates library is a $150 one-time add-on and is included free only with the Premium package. It isn't bundled with Standard, the $99 figure belongs to the Formation Kit, and it can be added on rather than requiring a full upgrade.`},
+
+{s:9,q:`Which statement about the Business Formation Kit is MOST accurate?`,
+ options:[
+  `A $99 add-on open to any customer, purchased on the website or the dashboard`,
+  `A $99 add-on for existing customers, purchased through the dashboard only`,
+  `A free inclusion that still ships with every current Premium-package order`,
+  `A $150 add-on handled directly by Bizee's own in-house fulfillment team`],
+ answer:`A $99 add-on for existing customers, purchased through the dashboard only`,
+ ex:`The Kit is now a $99 add-on for existing customers only, bought through the dashboard, not the website; it was formerly included with Premium (Platinum) but no longer is. It isn't open to anyone via the website, it isn't bundled with Premium anymore, and it's $99 and outsourced to FastKits — not $150 or handled in-house.`},
+
+/* ---------- SECTION 11: Policies, Refunds & Order Lifecycle (4) ---------- */
+{s:10,q:`A main order is still in Review. Which change can the customer make through the dashboard?`,
+ options:[
+  `Switch the entity type from an LLC to a corporation before it's filed`,
+  `Correct the company name, until midnight CST on the order day`,
+  `Add or remove a member from the formation before documents are submitted`,
+  `Upgrade from the Standard package to Premium during the review window`],
+ answer:`Correct the company name, until midnight CST on the order day`,
+ ex:`In Review, the customer can make limited edits — like correcting the company name — until midnight (12:00 AM CST) of the order day. Changing the entity type, adding or removing members, and upgrading or downgrading the package are all listed as restricted changes the dashboard won't allow.`},
+
+{s:10,q:`Which hold type leads to a refund if it expires unresolved?`,
+ options:[
+  `A Customer-Initiated hold, which auto-cancels and refunds after three months`,
+  `A Billing Department (fraud/ID) hold, canceled and refunded after five business days`,
+  `A Filing Department hold, refunded automatically once the three-month limit passes`,
+  `A Customer Service hold, which refunds the order whenever the agent reopens it`],
+ answer:`A Billing Department (fraud/ID) hold, canceled and refunded after five business days`,
+ ex:`All holds run up to three months and auto-cancel without a refund — except the Billing Department (fraud/ID) hold, which lasts up to five business days and is canceled and refunded if documentation isn't submitted. The Customer-Initiated, Filing, and Customer Service holds all cancel with no refund.`},
+
+{s:10,q:`An Amendment order sits in Processing and hasn't been forwarded to the state. Can it be canceled and refunded?`,
+ options:[
+  `Yes, the same as a main order that hasn't yet been forwarded to the state`,
+  `No; for miscellaneous orders, Processing status isn't cancelable or refundable`,
+  `Yes, provided there's no "Start Automation" comment in the order history`,
+  `No, but only because no order can ever be canceled once it leaves Review`],
+ answer:`No; for miscellaneous orders, Processing status isn't cancelable or refundable`,
+ ex:`For miscellaneous orders (Amendment, DBA, and the like), Processing is not cancelable or refundable at all — unlike main orders, where Processing can be canceled if it hasn't been forwarded and there's no "Start Automation" comment. The first and third options apply main-order rules, and the last overstates it: Review and a qualifying Hold are still cancelable.`},
+
+{s:10,q:`An agent placed a main order on a Customer Service hold and is now resuming it. Which step is correct?`,
+ options:[
+  `Move the order back to Review, since that's where holds are normally released`,
+  `Move the order to Processing, because Review triggers no internal action`,
+  `Leave the order on Hold and let the system release it after three months`,
+  `Forward the order to the state immediately to make up for the lost time`],
+ answer:`Move the order to Processing, because Review triggers no internal action`,
+ ex:`When resuming a Customer Service hold, the agent must move the order to Processing, never back to Review — Review status triggers no internal action and causes delays. Leaving it on Hold risks auto-cancellation, and an agent doesn't forward orders to the state; the Filing Department does that during Processing.`}
+];
+
+/* ============================================================
+   STATE
+============================================================ */
+let order = QUESTIONS.map((_,i)=>i);   // index into QUESTIONS, can be shuffled
+let optionOrders = [];                  // per-question option index order
+let userAnswers = [];                   // selected option VALUE (string) or null
+let current = 0;
+
+function buildOptionOrders(){
+  optionOrders = order.map(qi => shuffle([0,1,2,3]));
+}
+function shuffle(a){
+  const arr=a.slice();
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+function initState(shuffleQs){
+  if(shuffleQs) order = shuffle(order);
+  buildOptionOrders();
+  userAnswers = order.map(()=>null);
+  current = 0;
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+const qNow=document.getElementById('qNow'), qAns=document.getElementById('qAns'),
+      barFill=document.getElementById('barFill'), qSec=document.getElementById('qSec'),
+      qSecNo=document.getElementById('qSecNo'), qText=document.getElementById('qText'),
+      optionsEl=document.getElementById('options'), feedback=document.getElementById('feedback'),
+      verdict=document.getElementById('verdict'), why=document.getElementById('why'),
+      prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn'),
+      reviewBanner=document.getElementById('reviewBanner'), dotsEl=document.getElementById('dots');
+
+function letter(i){return ['A','B','C','D'][i];}
+
+function displayCurrentQuestion(){
+  hideGlossary();
+  const qi = order[current];
+  const Q = QUESTIONS[qi];
+  const answered = userAnswers[current] !== null;
+
+  qNow.textContent = current+1;
+  qSecNo.textContent = 'Question '+(current+1);
+  qSec.textContent = SECTIONS[Q.s];
+  qText.innerHTML = addGlossaryLinks(Q.q);
+  reviewBanner.classList.toggle('show', answered);
+
+  // build options in this question's shuffled order
+  optionsEl.innerHTML='';
+  const ord = optionOrders[current];
+  ord.forEach((optIdx,pos)=>{
+    const val = Q.options[optIdx];
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.type='button';
+    btn.innerHTML='<span class="key">'+letter(pos)+'</span><span class="body">'+escHtml(val)+'</span>';
+    if(answered){
+      btn.disabled=true;
+      const isCorrect = val===Q.answer;
+      const isChosen = val===userAnswers[current];
+      if(isCorrect) btn.classList.add('correct');
+      else if(isChosen) btn.classList.add('wrong');
+      else btn.classList.add('dim');
+    }else{
+      btn.addEventListener('click',()=>selectAnswer(val));
+    }
+    optionsEl.appendChild(btn);
+  });
+
+  // feedback
+  if(answered){
+    const correct = userAnswers[current]===Q.answer;
+    feedback.className='feedback show '+(correct?'ok':'no');
+    verdict.textContent = correct? '✓ Correct' : '✗ Not quite';
+    why.innerHTML = (correct?'' : '<strong>Best answer:</strong> '+escHtml(Q.answer)+'<br>') + escHtml(Q.ex);
+  }else{
+    feedback.className='feedback';
+  }
+
+  prevBtn.disabled = current===0;
+  nextBtn.disabled = !answered;
+  nextBtn.textContent = current===order.length-1 ? 'See results →' : 'Next →';
+
+  updateProgress();
+  buildDots();
+}
+
+function selectAnswer(val){
+  if(userAnswers[current]!==null) return; // locked
+  userAnswers[current]=val;
+  displayCurrentQuestion();
+}
+
+function updateProgress(){
+  const answered = userAnswers.filter(a=>a!==null).length;
+  qAns.textContent = answered;
+  barFill.style.width = ((current+1)/order.length*100)+'%';
+}
+
+function buildDots(){
+  dotsEl.innerHTML='';
+  order.forEach((qi,i)=>{
+    const d=document.createElement('button');
+    d.className='dot';
+    d.textContent=i+1;
+    if(userAnswers[i]!==null) d.classList.add('answered');
+    if(i===current) d.classList.add('current');
+    d.addEventListener('click',()=>jumpToQuestion(i));
+    dotsEl.appendChild(d);
+  });
+}
+function jumpToQuestion(i){
+  // can only jump to an answered question or the first unanswered (next in line)
+  const firstUnanswered = userAnswers.findIndex(a=>a===null);
+  if(userAnswers[i]!==null || i===firstUnanswered || i<=current){
+    current=i; displayCurrentQuestion();
+  }
+}
+
+prevBtn.addEventListener('click',()=>{ if(current>0){current--;displayCurrentQuestion();} });
+nextBtn.addEventListener('click',()=>{
+  if(userAnswers[current]===null) return;
+  if(current===order.length-1){ showResults(); }
+  else { current++; displayCurrentQuestion(); }
+});
+
+/* ============================================================
+   RESULTS
+============================================================ */
+function calculateSectionPerformance(){
+  const acc={};
+  order.forEach((qi,i)=>{
+    const Q=QUESTIONS[qi], s=SECTIONS[Q.s];
+    if(!acc[s]) acc[s]={correct:0,total:0};
+    acc[s].total++;
+    if(userAnswers[i]===Q.answer) acc[s].correct++;
+  });
+  return Object.entries(acc).map(([name,v])=>({name,correct:v.correct,total:v.total,pct:Math.round(v.correct/v.total*100)}));
+}
+function getMotivationalMessage(pct){
+  if(pct>=95) return {t:"🎉 Outstanding start",
+    m:"You've shown excellent command of Bizee operations after about three weeks of training. You've covered a lot of ground and built a strong foundation for the rest of your onboarding. Keep it up."};
+  if(pct>=85) return {t:"✅ Great progress — you're on track",
+    m:"You've got a solid grip on the core concepts from the past few weeks. A few areas still need strengthening, but this is a good foundation as you continue your onboarding. Keep going."};
+  if(pct>=70) return {t:"📚 Good progress — keep building",
+    m:"You've grasped several of the core concepts, which is a good start. There are some important areas to firm up as you continue onboarding. Review the sections below and you'll close the gaps."};
+  return {t:"💪 Keep working through it",
+    m:"Bizee operations take time to learn, and you're only a few weeks in. It's normal to feel challenged here. Focus on the areas below, revisit the training material, and retake the check — you've got room to grow into this."};
+}
+
+function showResults(){
+  hideGlossary();
+  document.getElementById('quiz').style.display='none';
+  const res=document.getElementById('results');
+  res.style.display='block';
+
+  const total=order.length;
+  let score=0;
+  order.forEach((qi,i)=>{ if(userAnswers[i]===QUESTIONS[qi].answer) score++; });
+  const pct=Math.round(score/total*100);
+  const pass=pct>=85;
+  const secPerf=calculateSectionPerformance();
+  const strengths=secPerf.filter(s=>s.pct>=85).sort((a,b)=>b.pct-a.pct).slice(0,3);
+  const improve=secPerf.filter(s=>s.pct<85).sort((a,b)=>a.pct-b.pct).slice(0,3);
+  const mood=getMotivationalMessage(pct);
+
+  let html='';
+  // score
+  html+='<div class="score-card">'
+     +'<div class="score-ring" style="color:'+(pass?'var(--green)':'var(--red)')+'">'+pct+'%</div>'
+     +'<div class="score-sub">'+score+' out of '+total+' correct · 85% needed to pass</div>'
+     +'<div class="badge '+(pass?'pass':'fail')+'">'+(pass?'✓ Passed — 85% mastery reached':'✗ Below 85% — retake required')+'</div>'
+     +'</div>';
+  // message
+  html+='<div class="msg-card"><h3>'+mood.t+'</h3><p>'+mood.m+'</p></div>';
+
+  // strengths
+  if(strengths.length){
+    html+='<div class="panel"><h3>Strongest areas</h3>';
+    strengths.forEach(s=>{
+      html+='<div class="sec-row good"><span class="nm">'+escHtml(s.name)+'</span><span class="pct">'+s.pct+'%</span></div>';
+    });
+    html+='</div>';
+  }
+  // improvements
+  if(improve.length){
+    html+='<div class="panel"><h3>Focus next on</h3>';
+    improve.forEach(s=>{
+      const cls=s.pct<50?'low':'mid';
+      html+='<div class="imp '+cls+'"><div class="top"><span class="nm">'+escHtml(s.name)+'</span><span class="pct">'+s.pct+'%</span></div>'
+          +'<div class="step">'+escHtml(NEXT_STEPS[s.name]||'')+'</div></div>';
+    });
+    html+='</div>';
+  }
+
+  // wrong answers
+  const wrong=[];
+  order.forEach((qi,i)=>{ if(userAnswers[i]!==QUESTIONS[qi].answer) wrong.push({i,qi}); });
+  if(wrong.length){
+    html+='<div class="panel"><h3>Review your misses ('+wrong.length+')</h3><div class="wrong-list">';
+    wrong.forEach(w=>{
+      const Q=QUESTIONS[w.qi];
+      html+='<div class="wr"><div class="wn">QUESTION '+(w.i+1)+' · '+escHtml(SECTIONS[Q.s])+'</div>'
+        +'<div class="wq">'+escHtml(Q.q)+'</div>'
+        +'<div class="ln you">Your answer: '+escHtml(userAnswers[w.i]||'(none)')+'</div>'
+        +'<div class="ln ans">Best answer: '+escHtml(Q.answer)+'</div>'
+        +'<div class="ex">'+escHtml(Q.ex)+'</div></div>';
+    });
+    html+='</div></div>';
+  }else{
+    html+='<div class="panel"><h3>Review your misses</h3><div class="sec-row good"><span class="nm">No misses — every question correct.</span><span class="pct">100%</span></div></div>';
+  }
+
+  // actions
+  html+='<div class="actions">';
+  if(!pass) html+='<button class="btn primary" id="retakeBtn">🔄 Retake quiz</button>';
+  html+='<button class="btn ghost" id="reviewBtn">📖 Review all answers</button>';
+  html+='<button class="btn ghost" id="shareBtn">📤 Share result</button>';
+  if(pass) html+='<button class="btn ghost" id="retakeBtn2">🔄 Retake quiz</button>';
+  html+='</div>';
+
+  res.innerHTML=html;
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  const rb=document.getElementById('retakeBtn'); if(rb) rb.addEventListener('click',retakeQuiz);
+  const rb2=document.getElementById('retakeBtn2'); if(rb2) rb2.addEventListener('click',retakeQuiz);
+  document.getElementById('reviewBtn').addEventListener('click',reviewAll);
+  document.getElementById('shareBtn').addEventListener('click',()=>shareResult(score,total,pct,pass));
+}
+
+function reviewAll(){
+  // jump back into the quiz, locked, at question 1, in review mode
+  document.getElementById('results').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  current=0;
+  displayCurrentQuestion();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function shareResult(score,total,pct,pass){
+  const txt='Bizee Operations Knowledge Check — '+score+'/'+total+' ('+pct+'%) '+(pass?'· Passed ✓':'· Retake needed');
+  if(navigator.share){
+    navigator.share({title:'Bizee Operations Quiz',text:txt}).catch(()=>{});
+  }else if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(()=>flash('Result copied to clipboard')).catch(()=>flash(txt));
+  }else{
+    flash(txt);
+  }
+}
+function flash(msg){
+  const f=document.createElement('div');
+  f.textContent=msg;
+  f.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;font-size:.85rem;z-index:80;box-shadow:0 10px 30px rgba(0,0,0,.2)';
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),2400);
+}
+
+function retakeQuiz(){
+  initState(true);            // reshuffle questions + options
+  document.getElementById('results').style.display='none';
+  document.getElementById('results').innerHTML='';
+  document.getElementById('quiz').style.display='block';
+  displayCurrentQuestion();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ============================================================
+   BOOT
+============================================================ */
+initState(false);
+displayCurrentQuestion();
+</script>
+</body>
+</html>
